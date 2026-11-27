@@ -1,0 +1,55 @@
+name: Build Call Forwarding by Nilay APK
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Unzip Android project
+        run: |
+          ZIP_FILE=$(find . -maxdepth 1 -name "*.zip" | head -n 1)
+          if [ -z "$ZIP_FILE" ]; then
+            echo "No .zip file found in repository root."
+            exit 1
+          fi
+          echo "Extracting $ZIP_FILE..."
+          unzip -o "$ZIP_FILE" -d project
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.10.2'
+
+      - name: Accept Android SDK Licenses
+        run: |
+          if [ -x "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" ]; then
+            yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
+          fi
+
+      - name: Build Debug APK
+        working-directory: project
+        run: gradle assembleDebug --stacktrace
+
+      - name: Rename APK for easy download
+        run: cp project/app/build/outputs/apk/debug/app-debug.apk CallForwardingByNilay.apk
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: CallForwardingByNilay-APK
+          path: CallForwardingByNilay.apk
+          retention-days: 30
