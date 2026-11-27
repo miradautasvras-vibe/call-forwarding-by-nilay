@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Call Forwarding by Nilay</string>
+    <string name="launcher_name">Call Forward</string>
+    <string name="widget_label">Call Forward Toggle (2x1)</string>
+    <string name="widget_description">One-tap Emerald toggle for clinic conditional call forwarding.</string>
+    <string name="tile_label">Call Forward</string>
+</resources>
